@@ -1,9 +1,9 @@
 <script setup></script>
 
 <template>
-  <div class="bg-red-500 text-white text-3xl p-10">
-    Hello world!
-  </div>
+  <main class="container mx-auto my-8 space-y-8">
+    <h1 class="text-4xl">Event Booking App</h1>
+  </main>
 </template>
 
 <style scoped></style>
