@@ -2,4 +2,10 @@ import { createApp } from 'vue'
 import App from './App.vue'
 import './assets/main.css'
 
-createApp(App).mount('#app')
+const app = createApp(App)
+
+if (import.meta.env.DEV) {
+  app.config.devtools = true;
+}
+
+app.mount('#app');
