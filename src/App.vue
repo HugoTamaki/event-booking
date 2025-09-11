@@ -1,6 +1,52 @@
 <script setup>
+  import { ref, onMounted } from 'vue';
+
   import EventCard from '@/components/EventCard.vue';
   import BookingItem from '@/components/BookingItem.vue';
+  import LoadingEventCard from '@/components/LoadingEventCard.vue';
+
+  const events = ref([]);
+  const eventsLoading = ref(false);
+  const registrationLoading = ref(false);
+
+  const fetchEvents = async () => {
+    eventsLoading.value = true;
+    try {
+      const response = await fetch('http://localhost:3001/events');
+      events.value = await response.json();
+    } finally {
+      eventsLoading.value = false;
+    }
+  };
+
+
+  const handleRegistration = async (event) => {
+    if (registrationLoading.value) return;
+    registrationLoading.value = true;
+
+    try {
+      const newBooking = {
+        id: Date.now().toString(),
+        userId: 1,
+        eventId: event.id,
+        eventTitle: event.title,
+      };
+
+      await fetch('http://localhost:3001/bookings', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ ...newBooking, status: 'confirmed' })
+      });
+    } finally {
+      registrationLoading.value = false;
+    }
+  };
+
+  onMounted(() => {
+    fetchEvents();
+  });
 </script>
 
 <template>
@@ -8,10 +54,12 @@
     <h1 class="text-4xl font-medium">Event Booking App</h1>
     <h2 class="text-2xl font-medium">All Events</h2>
     <section class="grid grid-cols-2 gap-8">
-      <EventCard title="Noansons" when="2025-09-29" description="bnaos asbhodh dhoshd" @register="console.log('Registered!')"/>
-      <EventCard title="Nnlanlna" when="2025-09-29" description="bnaos asbhodh dhoshd"/>
-      <EventCard title="Nnosnaos" when="2025-09-29" description="bnaos asbhodh dhoshd"/>
-      <EventCard title="Anosoansa" when="2025-09-29" description="bnaos asbhodh dhoshd"/>
+      <template v-if="!eventsLoading">
+        <EventCard v-for="event in events" :key="event.id" :title="event.title" :when="event.date" :description="event.description" @register="handleRegistration(event)"/>
+      </template>
+      <template v-else>
+        <LoadingEventCard v-for="i in 4" :key="i"/>
+      </template>
     </section>
     <h2 class="text-2xl font-medium">Your Bookings</h2>
     <section class="grid grid-cols-1 gap-4">
