@@ -1,7 +1,10 @@
 <template>
   <SectionCard>
     <div class="flex justify-between items-center">
-      <div>{{ title }}</div>
+      <div class="flex items-center space-x-2">
+        <span>{{ title }}</span>
+        <span class="text-sm text-gray-500">({{ status }})</span>
+      </div>
       <RoundButton variant="danger">Cancel</RoundButton>
     </div>
   </SectionCard>
@@ -12,6 +15,7 @@
   import RoundButton from '@/components/RoundButton.vue';
 
   defineProps({
-    title: String
+    title: String,
+    status: String
   });
 </script>
