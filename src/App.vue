@@ -32,6 +32,10 @@
     }
   };
 
+  const findBookingIndex = (id) => {
+    return bookings.value.findIndex( booking => booking.id === id );
+  };
+
   const handleRegistration = async (event) => {
     if (registrationLoading.value) return;
     registrationLoading.value = true;
@@ -62,7 +66,7 @@
         });
         
         if (response.ok) {
-          const index = bookings.value.findIndex(b => b.id === newBooking.id);
+          const index = findBookingIndex(newBooking.id);
           bookings.value[index] = await response.json();
         } else {
           throw new Error('Failed to register booking');
@@ -73,6 +77,32 @@
       }
     } finally {
       registrationLoading.value = false;
+    }
+  };
+
+  const cancelRegistrationLoading = ref(false);
+
+  const cancelRegistration = async (bookingId) => {
+    if (cancelRegistrationLoading.value) return;
+    cancelRegistrationLoading.value = true;
+    
+    const index = findBookingIndex(bookingId);
+    const originalBooking = bookings.value[index];
+    bookings.value.splice(index, 1);
+
+    try {
+      const response = await fetch(`http://localhost:3001/bookings/${bookingId}`, {
+        method: 'DELETE'
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to cancel booking');
+      }
+    } catch (e) {
+      console.error(e);
+      bookings.value.splice(index, 0, originalBooking);
+    } finally {
+      cancelRegistrationLoading.value = false;
     }
   };
 
@@ -97,7 +127,7 @@
     <h2 class="text-2xl font-medium">Your Bookings</h2>
     <section class="grid grid-cols-1 gap-4">
       <template v-if="!bookingsLoading">
-        <BookingItem v-for="booking in bookings" :key="booking.id" :title="booking.eventTitle" :status="booking.status"/>
+        <BookingItem v-for="booking in bookings" :key="booking.id" :title="booking.eventTitle" :status="booking.status" @cancelled="cancelRegistration(booking.id)"/>
       </template>
       <template v-else>
         <LoadingBookingCard v-for="i in 2" :key="i"/>
