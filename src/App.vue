@@ -30,6 +30,7 @@
 
     if (bookings.value.some( booking => booking.eventId === event.id && booking.userId === 1 )) {
       alert('You have already registered for this event.');
+      registrationLoading.value = false;
       return;
     }
 
