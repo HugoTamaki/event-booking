@@ -16,7 +16,7 @@
     <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8">
       <template v-if="!loading">
         <template v-if="events.length">
-          <EventCard v-for="event in events" :key="event.id" :title="event.title" :when="event.date" :description="event.description" @register="$emit('register', event)"/>
+          <EventCard v-for="event in events" :key="event.id" :title="event.title" :when="event.date" :description="event.description" @register="handleRegistration(event)"/>
         </template>
         <template v-else>
           <div class="col-span-2 text-center text-gray-500">
@@ -35,6 +35,9 @@
   import { ref, onMounted } from 'vue';import EventCard from '@/components/EventCard.vue';
   import LoadingEventCard from '@/components/LoadingEventCard.vue';
   import SectionCard from '@/components/SectionCard.vue';
+  import useBookings from '@/composables/useBookings';
+
+  const { handleRegistration } = useBookings();
 
   const events = ref([]);
   const loading = ref(false);
@@ -53,8 +56,6 @@
       loading.value = false;
     }
   };
-
-  defineEmits(['register']);
 
   onMounted(() => {
     fetchEvents();
